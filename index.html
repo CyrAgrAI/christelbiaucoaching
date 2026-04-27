@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Christel Biau Coaching — UI Kit v2</title>
+<style>
+  @font-face {
+    font-family: 'Christel';
+    src: url('fonts/fontchristel.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: #fff; font-family: 'Lato', sans-serif; color: #212121; }
+  #root { min-height: 100vh; }
+
+  /* Audience card gradient border — signature brand element */
+  .audience-card {
+    position: relative; border-radius: 8px; overflow: hidden;
+    border: 3px solid transparent;
+    background: linear-gradient(#111,#111) padding-box,
+                linear-gradient(135deg, #ffa64d, #ff9020, #c62828) border-box;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+/* ── Shared helpers ─────────────────────────────────────── */
+const ASSETS = 'assets/';
+
+const Btn = ({ children, variant='primary', onClick, style={} }) => {
+  const base = { fontFamily:"'Lato',sans-serif", fontSize:13, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', padding:'13px 28px', borderRadius:4, border:'none', cursor:'pointer', transition:'all 150ms ease', display:'inline-block', ...style };
+  const variants = {
+    primary: { background:'#c62828', color:'#fff' },
+    accent:  { background:'#ff9020', color:'#fff' },
+    outline: { background:'transparent', color:'#c62828', border:'2px solid #c62828' },
+    dark:    { background:'#1a1a1a', color:'#fff' },
+    light:   { background:'#fff', color:'#c62828' },
+  };
+  return <button style={{...base, ...variants[variant]}} onClick={onClick}>{children}</button>;
+};
+
+/* ── Nav ────────────────────────────────────────────────── */
+const Nav = ({ page, go }) => {
+  const [prog, setProg] = React.useState(false);
+  return (
+    <div style={{ position:'sticky', top:0, zIndex:100 }}>
+      {/* Banner */}
+      <div style={{ background:'#c62828', color:'#fff', textAlign:'center', padding:'8px 16px', fontSize:12, fontFamily:"'Lato',sans-serif", fontWeight:700, letterSpacing:'0.06em' }}>
+        1 AUDIO OFFERT chaque semaine par email &nbsp;
+        <span style={{ color:'#ffa64d', textDecoration:'underline', cursor:'pointer' }}>Recevoir →</span>
+      </div>
+      {/* Nav bar */}
+      <nav style={{ background:'#fff', boxShadow:'0 2px 8px rgba(0,0,0,0.10)', padding:'0 48px', height:64, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+        <div onClick={() => go('home')} style={{ cursor:'pointer', display:'flex', alignItems:'center', gap:12 }}>
+          <img src={ASSETS+'logo.jpg'} alt="Logo" style={{ height:48, width:48, borderRadius:'50%', objectFit:'cover' }} />
+          <span style={{ fontFamily:"'Christel',cursive", fontSize:26, color:'#212121' }}>Christel Biau Coaching</span>
+        </div>
+        <div style={{ display:'flex', gap:24, alignItems:'center' }}>
+          {[['home','Accueil'],['about','Qui suis-je'],['accompagnements','Accompagnements']].map(([id,label]) => (
+            <span key={id} onClick={() => go(id)} style={{ fontFamily:"'Lato',sans-serif", fontSize:13, fontWeight:700, letterSpacing:'0.06em', textTransform:'uppercase', color: page===id ? '#c62828' : '#555', cursor:'pointer' }}>{label}</span>
+          ))}
+          <div style={{ position:'relative' }} onMouseEnter={() => setProg(true)} onMouseLeave={() => setProg(false)}>
+            <span style={{ fontFamily:"'Lato',sans-serif", fontSize:13, fontWeight:700, letterSpacing:'0.06em', textTransform:'uppercase', color: page==='programmes' ? '#c62828' : '#555', cursor:'pointer' }}>Programmes ▾</span>
+            {prog && (
+              <div style={{ position:'absolute', top:'100%', left:0, background:'#fff', boxShadow:'0 4px 16px rgba(0,0,0,0.15)', borderRadius:4, minWidth:260, zIndex:200, paddingTop:4, paddingBottom:4 }}>
+                {['Reset Mental 21J','Renaissance Féminine','Manifest'].map(p => (
+                  <div key={p} onClick={() => go('programmes')} style={{ padding:'10px 18px', fontSize:13, fontFamily:"'Lato',sans-serif", color:'#212121', cursor:'pointer', borderBottom:'1px solid #f0f0f0' }}>{p}</div>
+                ))}
+              </div>
+            )}
+          </div>
+          <Btn variant="accent" onClick={() => go('bilan')} style={{ fontSize:12, padding:'10px 20px' }}>Bilan offert 🔥</Btn>
+        </div>
+      </nav>
+    </div>
+  );
+};
+
+/* ── Home Page ──────────────────────────────────────────── */
+const AudienceCard = ({ img, title, sub }) => (
+  <div className="audience-card" style={{ aspectRatio:'4/3', cursor:'pointer' }}>
+    <img src={img} alt={title} style={{ width:'100%', height:'100%', objectFit:'cover', opacity:0.8, display:'block' }} />
+    <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'space-between', padding:'12px 10px 10px' }}>
+      <div style={{ fontFamily:"'Montserrat',sans-serif", fontSize:18, fontWeight:800, color:'#fff', textTransform:'uppercase', letterSpacing:'0.02em', textShadow:'0 1px 8px rgba(0,0,0,0.7)', lineHeight:1.2 }}>{title}</div>
+      <div style={{ background:'rgba(20,8,0,0.65)', borderRadius:10, padding:'8px 10px', fontFamily:"'Lato',sans-serif", fontSize:12, color:'#f5e8c0', lineHeight:1.45, textAlign:'center' }}>
+        {sub}<br /><span style={{ color:'#ffa64d', fontWeight:700, fontSize:11, letterSpacing:'0.06em', textTransform:'uppercase' }}>Plus d'info</span>
+      </div>
+    </div>
+  </div>
+);
+
+const HomePage = ({ go }) => {
+  const audiences = [
+    { img: ASSETS+'audience-particulier.jpg',  title:'Le Particulier',     sub:'Brouillard mental, fatigue émotionnelle ou perte de sens' },
+    { img: ASSETS+'audience-entrepreneur.jpg', title:"L'Entrepreneur",     sub:'Jongle entre décisions, responsabilités et doutes' },
+    { img: ASSETS+'audience-solopreneur.jpg',  title:'Le Solopreneur',     sub:'Charge mentale et solitude décisionnelle' },
+    { img: ASSETS+'audience-dirigeant.jpg',    title:'Le Dirigeant',       sub:'Pression, épuisement, équilibre exigence/humanité' },
+    { img: ASSETS+'audience-superwoman.jpg',   title:'La Superwoman',      sub:'Changements hormonaux, manque de clarté émotionnelle' },
+    { img: ASSETS+'audience-sportif.jpg',      title:'Le Sportif',         sub:'Optimiser concentration, confiance et stress' },
+    { img: ASSETS+'audience-adolescent.jpg',   title:"L'Adolescent",       sub:'Repères, confiance, équilibre émotionnel' },
+    { img: ASSETS+'audience-transition.jpg',   title:'Transition de Vie',  sub:'Changement de rythme ? Retrouver un nouvel équilibre' },
+  ];
+  const services = [
+    { img: ASSETS+'image-accompagnement.jpg', title:'Accompagnement individuel' },
+    { img: ASSETS+'image-programmes.jpg',   title:'Programmes de transformation' },
+    { img: ASSETS+'image-coffret.jpg',      title:'Coffret audio numérique' },
+  ];
+
+  return (
+    <div>
+      {/* Hero */}
+      <div style={{ position:'relative', height:580, overflow:'hidden' }}>
+        <img src={ASSETS+'hero-cinematic.jpg'} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center 20%' }} />
+        <div style={{ position:'absolute', inset:0, background:'linear-gradient(90deg, rgba(26,26,26,0.85) 50%, rgba(26,26,26,0.2) 100%)' }} />
+        <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', padding:'0 80px', maxWidth:760 }}>
+          <div>
+            <div style={{ fontFamily:"'Lato',sans-serif", fontSize:11, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:'#ffa64d', marginBottom:16 }}>Reprogrammation mentale · Coaching</div>
+            <h1 style={{ fontFamily:"'Montserrat',sans-serif", fontSize:48, fontWeight:800, color:'#fff', lineHeight:1.1, marginBottom:20, letterSpacing:'-0.02em' }}>
+              Avance avec clarté<br />et fluidité grâce à la<br /><span style={{ fontFamily:"'Christel',cursive", fontSize:58, fontWeight:'normal', color:'#ffa64d', letterSpacing:0 }}>reprogrammation mentale</span>
+            </h1>
+            <div style={{ marginBottom:28 }}>
+              {['Apaise les pensées envahissantes','Clarifie les doutes qui freinent l\'action','Renforce la confiance dans tes décisions'].map((t,i) => (
+                <div key={i} style={{ fontFamily:"'Lato',sans-serif", fontSize:15, color:'rgba(255,255,255,0.9)', marginBottom:8, display:'flex', gap:10, alignItems:'center' }}>
+                  <span style={{ color:'#ff9020', fontWeight:700 }}>✓</span> {t}
+                </div>
+              ))}
+            </div>
+            <div style={{ display:'flex', gap:12 }}>
+              <Btn variant="accent" onClick={() => go('bilan')}>Bilan diagnostic offert 🔥</Btn>
+              <Btn variant="outline" onClick={() => go('programmes')} style={{ color:'#fff', borderColor:'rgba(255,255,255,0.5)' }}>Découvrir les programmes</Btn>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Services */}
+      <div style={{ background:'#1a1a1a', padding:'64px 48px' }}>
+        <div style={{ maxWidth:1100, margin:'0 auto' }}>
+          <div style={{ textAlign:'center', marginBottom:40 }}>
+            <div style={{ fontFamily:"'Lato',sans-serif", fontSize:10, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:'#ff9020', marginBottom:12 }}>Mes solutions</div>
+            <h2 style={{ fontFamily:"'Montserrat',sans-serif", fontSize:34, fontWeight:800, color:'#fff', lineHeight:1.2 }}>Découvre les solutions pour avancer</h2>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
+            {services.map((s,i) => (
+              <div key={i} onClick={() => go('programmes')} style={{ position:'relative', aspectRatio:'1', borderRadius:6, overflow:'hidden', cursor:'pointer' }}>
+                <img src={s.img} alt={s.title} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.35)', display:'flex', alignItems:'flex-end', padding:'20px' }}>
+                  <div style={{ fontFamily:"'Montserrat',sans-serif", fontSize:18, fontWeight:800, color:'#fff', textTransform:'uppercase', letterSpacing:'0.03em', lineHeight:1.2, textShadow:'0 1px 6px rgba(0,0,0,0.6)' }}>{s.title}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Audience grid */}
+      <div style={{ background:'#f5f5f0', padding:'64px 48px' }}>
+        <div style={{ maxWidth:1100, margin:'0 auto' }}>
+          <div style={{ textAlign:'center', marginBottom:40 }}>
+            <div style={{ fontFamily:"'Lato',sans-serif", fontSize:10, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:'#c62828', marginBottom:12 }}>À qui ça s'adresse ?</div>
+            <h2 style={{ fontFamily:"'Montserrat',sans-serif", fontSize:34, fontWeight:800, color:'#212121', lineHeight:1.2 }}>La reprogrammation mentale<br />pour tous les profils</h2>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12 }}>
+            {audiences.map((a,i) => <AudienceCard key={i} {...a} />)}
+          </div>
+        </div>
+      </div>
+
+      {/* Christel teaser */}
+      <div style={{ background:'#212121', padding:'64px 48px' }}>
+        <div style={{ maxWidth:1100, margin:'0 auto', display:'flex', gap:56, alignItems:'center' }}>
+          <div style={{ position:'relative', width:280, height:280, flexShrink:0 }}>
+            <div style={{ position:'absolute', inset:0, borderRadius:'50%', background:'linear-gradient(135deg,#ffa64d,#c62828)', padding:4 }}>
+              <div style={{ width:'100%', height:'100%', borderRadius:'50%', overflow:'hidden' }}>
+                <img src={ASSETS+'christel-portrait.jpg'} alt="Christel" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'top' }} />
+              </div>
+            </div>
+          </div>
+          <div style={{ flex:1 }}>
+            <div style={{ fontFamily:"'Lato',sans-serif", fontSize:10, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:'#ffa64d', marginBottom:14 }}>Qui suis-je ?</div>
+            <h2 style={{ fontFamily:"'Montserrat',sans-serif", fontSize:32, fontWeight:800, color:'#fff', lineHeight:1.2, marginBottom:16 }}>Entrepreneure, préparateur mental,<br />et femme de terrain</h2>
+            <p style={{ fontFamily:"'Lato',sans-serif", fontSize:15, color:'rgba(255,255,255,0.7)', lineHeight:1.75, marginBottom:24 }}>Certifiée en préparation mentale, initiée aux neurosciences et au coaching professionnel. 17 années d'expérimentation — sport de compétition, burn-out, reconstruction, grave accident. Je t'aide à comprendre ton cerveau et installer de nouvelles habitudes, durablement.</p>
+            <Btn variant="light" onClick={() => go('about')}>Mon histoire →</Btn>
+          </div>
+        </div>
+      </div>
+
+      {/* Quote + CTA */}
+      <div style={{ background:'#fff', padding:'64px 48px', textAlign:'center' }}>
+        <blockquote style={{ fontFamily:"'Montserrat',sans-serif", fontSize:26, fontWeight:300, fontStyle:'italic', color:'#212121', maxWidth:680, margin:'0 auto 36px', lineHeight:1.5, borderLeft:'4px solid #ffa64d', paddingLeft:24, textAlign:'left' }}>
+          "Ta clarté intérieure est le point de départ de toutes tes réussites."
+        </blockquote>
+        <div style={{ fontFamily:"'Lato',sans-serif", fontSize:16, color:'#555', marginBottom:28, lineHeight:1.7 }}>
+          🌿 J'ai créé une courte vidéo (3mn) pour t'aider à trouver la solution qui correspond à ton besoin.
+        </div>
+        <Btn variant="accent" onClick={() => go('bilan')} style={{ fontSize:14, padding:'15px 36px' }}>Découvrir les 3 options</Btn>
+      </div>
+    </div>
+  );
+};
+
+/* ── Programmes Page ────────────────────────────────────── */
+const ProgrammesPage = ({ go }) => {
+  const progs = [
+    { img: ASSETS+'audience-solopreneur.jpg', color:'#c62828', tag:'Programme 21 jours', title:'Reset Mental 21J', desc:'21 jours pour reprogrammer ton mental, apaiser les pensées envahissantes et installer de nouvelles habitudes durables.', cta:'Découvrir →' },
+    { img: ASSETS+'audience-superwoman.jpg',  color:'#ff9020', tag:'Méthode féminine',   title:'Renaissance Féminine', desc:'Retrouve ton équilibre et ta puissance à chaque étape de ta vie féminine — cycles, transitions, ménopause.', cta:'Découvrir →' },
+    { img: ASSETS+'audience-entrepreneur.jpg',color:'#c62828', tag:'Programme 30 jours', title:'Manifest', desc:'Transforme tes intentions en résultats concrets grâce à un plan d\'action aligné avec tes valeurs.', cta:'Découvrir →' },
+    { img: ASSETS+'femme-laptop.jpg',          color:'#ff9020', tag:'Accompagnement',    title:'Coaching Individuel', desc:'Un suivi personnalisé en visioconférence, avec exercices et outils concrets, adapté à ton rythme.', cta:'Prendre RDV →' },
+    { img: ASSETS+'image-programmes.jpg',      color:'#c62828', tag:'Programmes',        title:'Transformation', desc:'Programmes structurés avec audios, exercices et ancrage quotidiens pour des résultats concrets.', cta:'En savoir plus →' },
+    { img: ASSETS+'image-coffret.jpg',         color:'#ff9020', tag:'Coffret audio',     title:'Coffret Numérique', desc:'Un coffret soigneusement conçu avec audios guidés, affirmations et outils pratiques de transformation.', cta:'Commander →' },
+  ];
+  return (
+    <div style={{ background:'#f5f5f0' }}>
+      <div style={{ background:'#1a1a1a', padding:'56px 48px', textAlign:'center' }}>
+        <div style={{ fontFamily:"'Lato',sans-serif", fontSize:10, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:'#ffa64d', marginBottom:14 }}>Mes solutions</div>
+        <h1 style={{ fontFamily:"'Montserrat',sans-serif", fontSize:42, fontWeight:800, color:'#fff', lineHeight:1.2 }}>Programmes & Accompagnements</h1>
+      </div>
+      <div style={{ maxWidth:1100, margin:'0 auto', padding:'56px 48px', display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20 }}>
+        {progs.map((p,i) => (
+          <div key={i} style={{ background:'#fff', borderRadius:6, overflow:'hidden', boxShadow:'0 2px 8px rgba(0,0,0,0.08)' }}>
+            <div style={{ position:'relative', height:160, overflow:'hidden' }}>
+              <img src={p.img} alt={p.title} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+              <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.3)' }} />
+              <div style={{ position:'absolute', top:12, left:12, background:p.color, color:'#fff', fontFamily:"'Lato',sans-serif", fontSize:10, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', padding:'4px 10px', borderRadius:2 }}>{p.tag}</div>
+            </div>
+            <div style={{ padding:'20px 22px 24px' }}>
+              <h3 style={{ fontFamily:"'Montserrat',sans-serif", fontSize:20, fontWeight:800, color:'#212121', marginBottom:10, lineHeight:1.2 }}>{p.title}</h3>
+              <p style={{ fontFamily:"'Lato',sans-serif", fontSize:13, color:'#555', lineHeight:1.75, marginBottom:16 }}>{p.desc}</p>
+              <span style={{ fontFamily:"'Lato',sans-serif", fontSize:12, fontWeight:700, color:p.color, letterSpacing:'0.06em', textDecoration:'underline', textUnderlineOffset:3, cursor:'pointer' }}>{p.cta}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ── About Page ─────────────────────────────────────────── */
+const AboutPage = ({ go }) => (
+  <div>
+    <div style={{ position:'relative', height:400, overflow:'hidden' }}>
+      <img src={ASSETS+'about-desert.jpg'} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+      <div style={{ position:'absolute', inset:0, background:'linear-gradient(to right, rgba(26,26,26,0.8) 40%, transparent)' }} />
+      <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', padding:'0 80px' }}>
+        <div>
+          <div style={{ fontFamily:"'Lato',sans-serif", fontSize:10, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:'#ffa64d', marginBottom:14 }}>Qui suis-je</div>
+          <h1 style={{ fontFamily:"'Montserrat',sans-serif", fontSize:44, fontWeight:800, color:'#fff', lineHeight:1.15 }}>Derrière une femme forte :<br />une quête de liberté</h1>
+        </div>
+      </div>
+    </div>
+    <div style={{ background:'#fff', padding:'64px 80px' }}>
+      <div style={{ maxWidth:900, margin:'0 auto', display:'flex', gap:48, alignItems:'flex-start' }}>
+        <div style={{ position:'relative', width:260, height:260, flexShrink:0 }}>
+          <div style={{ position:'absolute', inset:0, borderRadius:'50%', background:'linear-gradient(135deg,#ffa64d,#c62828)', padding:4 }}>
+            <div style={{ width:'100%', height:'100%', borderRadius:'50%', overflow:'hidden' }}>
+              <img src={ASSETS+'christel-portrait.jpg'} alt="Christel" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'top' }} />
+            </div>
+          </div>
+        </div>
+        <div style={{ flex:1 }}>
+          <h2 style={{ fontFamily:"'Montserrat',sans-serif", fontSize:28, fontWeight:800, color:'#212121', marginBottom:16, lineHeight:1.2 }}>Je m'appelle Christel</h2>
+          <p style={{ fontFamily:"'Lato',sans-serif", fontSize:15, color:'#555', lineHeight:1.85, marginBottom:16 }}>Entrepreneure passionnée et préparateur mental depuis 2007. Certifiée en préparation mentale, initiée aux neurosciences et au coaching professionnel, j'allie performance et humanité dans chacun de mes accompagnements.</p>
+          <p style={{ fontFamily:"'Lato',sans-serif", fontSize:15, color:'#555', lineHeight:1.85, marginBottom:24 }}>Mon approche est le fruit de 17 années d'expérimentation — sport de compétition (médaille d'argent aux championnats du monde master de saut à la perche), burn-out, reconstruction, grave accident en 2022. J'ai traversé le chaos et aujourd'hui j'aide les autres à faire de leur mental leur meilleur allié.</p>
+          <Btn variant="primary" onClick={() => go('bilan')}>Réserver mon bilan offert</Btn>
+        </div>
+      </div>
+      <div style={{ maxWidth:900, margin:'48px auto 0', padding:'32px', background:'#f5f5f0', borderRadius:8, borderLeft:'4px solid #ffa64d' }}>
+        <blockquote style={{ fontFamily:"'Montserrat',sans-serif", fontSize:22, fontWeight:600, fontStyle:'italic', color:'#212121', lineHeight:1.5 }}>
+          "La puissance n'est pas dans la performance, mais dans l'alignement"
+        </blockquote>
+      </div>
+      <div style={{ maxWidth:900, margin:'48px auto 0', display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:16 }}>
+        {[['Respect','De soi, des autres, du rythme de la vie.'],['Liberté','De penser, de choisir, d\'incarner sa vérité.'],['Authenticité','C\'est dans la vulnérabilité que naît la vraie force.'],['Dépassement de soi','Non pas contre soi, mais pour soi.']].map(([t,d],i) => (
+          <div key={i} style={{ padding:'20px 24px', border:'1px solid #e0e0e0', borderRadius:6, borderTop:`3px solid ${i%2===0?'#c62828':'#ff9020'}` }}>
+            <div style={{ fontFamily:"'Montserrat',sans-serif", fontSize:16, fontWeight:800, color:'#212121', marginBottom:6 }}>{t}</div>
+            <div style={{ fontFamily:"'Lato',sans-serif", fontSize:13, color:'#555', lineHeight:1.7 }}>{d}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+/* ── Bilan Page ─────────────────────────────────────────── */
+const BilanPage = ({ go }) => (
+  <div style={{ background:'#f5f5f0', minHeight:'80vh' }}>
+    <div style={{ background:'#c62828', padding:'56px 48px', textAlign:'center' }}>
+      <div style={{ fontFamily:"'Lato',sans-serif", fontSize:10, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:'rgba(255,255,255,0.7)', marginBottom:14 }}>Offert · 30 minutes</div>
+      <h1 style={{ fontFamily:"'Montserrat',sans-serif", fontSize:42, fontWeight:800, color:'#fff', lineHeight:1.2 }}>Bilan Diagnostic Offert</h1>
+    </div>
+    <div style={{ maxWidth:680, margin:'0 auto', padding:'56px 48px', textAlign:'center' }}>
+      <p style={{ fontFamily:"'Lato',sans-serif", fontSize:16, color:'#555', lineHeight:1.8, marginBottom:40 }}>La première étape pour comprendre ce qui se joue en toi. Avant toute transformation, il est essentiel de savoir où tu en es.</p>
+      {['🍃 Identifier tes blocages principaux','🍃 Évaluer ton niveau d\'énergie actuel','🍃 Découvrir les axes à renforcer','🍃 Trouver la solution adaptée à tes besoins'].map((f,i) => (
+        <div key={i} style={{ fontFamily:"'Lato',sans-serif", fontSize:15, color:'#212121', marginBottom:12, textAlign:'left', display:'flex', gap:12, alignItems:'center', background:'#fff', padding:'14px 20px', borderRadius:4, boxShadow:'0 1px 3px rgba(0,0,0,0.08)' }}>
+          {f}
+        </div>
+      ))}
+      <div style={{ marginTop:40, background:'#fff', borderRadius:8, padding:'36px', boxShadow:'0 4px 16px rgba(0,0,0,0.08)' }}>
+        <div style={{ fontFamily:"'Lato',sans-serif", fontSize:10, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:'#888', marginBottom:12 }}>Prendre rendez-vous</div>
+        <div style={{ fontFamily:"'Montserrat',sans-serif", fontSize:26, fontWeight:800, color:'#212121', marginBottom:20, lineHeight:1.3 }}>Réserve ton appel<br />de 30 minutes</div>
+        <Btn variant="accent" style={{ fontSize:14, padding:'15px 40px' }}>Prendre RDV sur Calendly →</Btn>
+        <div style={{ fontFamily:"'Lato',sans-serif", fontSize:12, color:'#888', marginTop:14 }}>Séance gratuite, sans engagement. Via visioconférence.</div>
+      </div>
+    </div>
+  </div>
+);
+
+/* ── Footer ─────────────────────────────────────────────── */
+const Footer = ({ go }) => (
+  <footer style={{ background:'#1a1a1a', color:'#fff', padding:'56px 48px 28px' }}>
+    <div style={{ maxWidth:1100, margin:'0 auto' }}>
+      <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:48, marginBottom:40 }}>
+        <div>
+          <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:16 }}>
+            <img src={ASSETS+'logo.jpg'} alt="Logo" style={{ height:48, width:48, borderRadius:'50%', objectFit:'cover' }} />
+            <span style={{ fontFamily:"'Christel',cursive", fontSize:24, color:'#fff' }}>Christel Biau Coaching</span>
+          </div>
+          <p style={{ fontFamily:"'Lato',sans-serif", fontSize:13, color:'rgba(255,255,255,0.55)', lineHeight:1.75, marginBottom:20 }}>Développe clarté, confiance et stabilité intérieure au service de ta vie personnelle et professionnelle.</p>
+          <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+            {['TikTok','Instagram','Facebook','LinkedIn','YouTube'].map(n => (
+              <span key={n} style={{ fontFamily:"'Lato',sans-serif", fontSize:10, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'#ffa64d', padding:'5px 10px', border:'1px solid rgba(255,164,77,0.3)', borderRadius:3, cursor:'pointer' }}>{n}</span>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div style={{ fontFamily:"'Lato',sans-serif", fontSize:10, fontWeight:700, letterSpacing:'0.16em', textTransform:'uppercase', color:'#ff9020', marginBottom:16 }}>Navigation</div>
+          {['Accueil','Programmes','Accompagnements','Coffret','Qui suis-je','Cadeaux'].map(l => (
+            <div key={l} style={{ fontFamily:"'Lato',sans-serif", fontSize:13, color:'rgba(255,255,255,0.55)', marginBottom:10, cursor:'pointer' }}>{l}</div>
+          ))}
+        </div>
+        <div>
+          <div style={{ fontFamily:"'Lato',sans-serif", fontSize:10, fontWeight:700, letterSpacing:'0.16em', textTransform:'uppercase', color:'#ff9020', marginBottom:16 }}>Commencer</div>
+          <div onClick={() => go('bilan')} style={{ fontFamily:"'Lato',sans-serif", fontSize:13, color:'#ffa64d', fontWeight:700, marginBottom:10, cursor:'pointer' }}>🔥 Bilan offert 30mn</div>
+          <div style={{ fontFamily:"'Lato',sans-serif", fontSize:10, fontWeight:700, letterSpacing:'0.16em', textTransform:'uppercase', color:'#ff9020', marginTop:20, marginBottom:12 }}>Contact</div>
+          <a href="mailto:contact@christelbiau.fr" style={{ fontFamily:"'Lato',sans-serif", fontSize:13, color:'rgba(255,255,255,0.55)' }}>contact@christelbiau.fr</a>
+        </div>
+      </div>
+      <hr style={{ borderColor:'rgba(255,255,255,0.1)', marginBottom:20 }} />
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:12 }}>
+        <div style={{ fontFamily:"'Lato',sans-serif", fontSize:12, color:'rgba(255,255,255,0.3)' }}>Copyright 2025 · christelbiau.fr</div>
+        <div style={{ fontFamily:"'Lato',sans-serif", fontSize:11, color:'rgba(255,255,255,0.3)', maxWidth:460, textAlign:'right', lineHeight:1.6 }}>Mon accompagnement s'inscrit dans une démarche de coaching et de préparation mentale. Il ne se substitue en aucun cas à un suivi médical ou thérapeutique.</div>
+      </div>
+    </div>
+  </footer>
+);
+
+/* ── App ────────────────────────────────────────────────── */
+const App = () => {
+  const [page, setPage] = React.useState('home');
+  const pages = { home: <HomePage go={setPage} />, programmes: <ProgrammesPage go={setPage} />, accompagnements: <ProgrammesPage go={setPage} />, about: <AboutPage go={setPage} />, bilan: <BilanPage go={setPage} /> };
+  return (
+    <div>
+      <Nav page={page} go={setPage} />
+      <main>{pages[page] || pages.home}</main>
+      <Footer go={setPage} />
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
